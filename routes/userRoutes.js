@@ -4,7 +4,7 @@ const User = require('../models/user.js');
 
 
 
-router.post('/users', async (req, res) => {
+router.post('/', async (req, res) => {
 
   try {
     const newUser = new User(req.body);
@@ -12,9 +12,11 @@ router.post('/users', async (req, res) => {
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
 
+
   } catch (err) {
 
     res.status(400).json({ message: err.message });
+
   }
 });
 
@@ -28,5 +30,25 @@ router.get('/', async (req, res) => {
 
   }
 });
+
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'User updated successfully', user: updatedUser });
+
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 
 module.exports = router;
